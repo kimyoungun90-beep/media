@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1f3a" />
+  <meta name="description" content="사진과 동영상을 기기 안에서 압축하고 원래 파일명 그대로 ZIP으로 받는 웹앱" />
+  <title>사진·동영상 용량 줄이기</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="img"><rect x="5" y="8" width="38" height="32" rx="10"/><circle cx="18" cy="20" r="4"/><path d="M10 34l9-9 6 6 5-5 8 8"/><path d="M34 12v8m-4-4h8"/></svg>
+      </div>
+      <div>
+        <p class="eyebrow">PRIVATE MEDIA COMPRESSOR</p>
+        <h1>사진·동영상 용량 줄이기</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero-card">
+      <div>
+        <span class="privacy-badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5.2-3.4 9.7-8 11-4.6-1.3-8-5.8-8-11V5l8-3z"/><path d="M8.5 12l2.2 2.2 4.8-5"/></svg>
+          파일은 외부 서버로 전송되지 않습니다
+        </span>
+        <h2>파일명은 그대로, 용량만 가볍게</h2>
+        <p>사진은 목표 KB에 맞춰 순차 압축하고, 동영상은 선택했을 때만 압축 엔진을 불러옵니다.</p>
+      </div>
+      <div class="hero-stats" aria-label="주요 기능">
+        <div><strong>100장</strong><span>ZIP당 사진</span></div>
+        <div><strong>50KB</strong><span>최소 설정</span></div>
+        <div><strong>원본명</strong><span>파일명 유지</span></div>
+      </div>
+    </section>
+
+    <section class="upload-card card">
+      <div class="section-heading">
+        <div>
+          <span class="step-badge">1</span>
+          <h2>파일 선택</h2>
+        </div>
+        <button id="clearButton" class="text-button" type="button" disabled>전체 비우기</button>
+      </div>
+
+      <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="사진과 동영상 파일 선택">
+        <div class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5l5 5"/><path d="M5 13v5a2 2 0 002 2h10a2 2 0 002-2v-5"/></svg>
+        </div>
+        <h3>사진·동영상을 여기에 놓으세요</h3>
+        <p>JPG, JPEG, PNG, WebP / MP4, MOV, M4V, WebM, AVI</p>
+        <div class="picker-row">
+          <label class="primary-button compact" for="fileInput">파일 선택</label>
+          <label class="secondary-button compact" for="folderInput">폴더 선택</label>
+        </div>
+        <input id="fileInput" class="visually-hidden" type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/x-msvideo,.m4v" />
+        <input id="folderInput" class="visually-hidden" type="file" multiple webkitdirectory directory accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/x-msvideo,.m4v" />
+      </div>
+
+      <div id="selectionNotice" class="inline-notice hidden" role="status"></div>
+
+      <div class="summary-grid">
+        <div class="summary-item"><span>선택 파일</span><strong id="selectedCount">0개</strong></div>
+        <div class="summary-item"><span>사진</span><strong id="imageCount">0장</strong></div>
+        <div class="summary-item"><span>동영상</span><strong id="videoCount">0개</strong></div>
+        <div class="summary-item"><span>원본 용량</span><strong id="originalSize">0 B</strong></div>
+      </div>
+    </section>
+
+    <section class="settings-card card">
+      <div class="section-heading">
+        <div>
+          <span class="step-badge">2</span>
+          <h2>압축 설정</h2>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <div class="setting-block">
+          <div class="setting-title-row">
+            <div>
+              <span class="media-label photo">PHOTO</span>
+              <h3>사진 목표 용량</h3>
+            </div>
+            <span class="setting-help">파일당 기준</span>
+          </div>
+          <div class="preset-grid" id="imagePresetGroup">
+            <label class="preset-card">
+              <input type="radio" name="imagePreset" value="high" />
+              <span><b>고화질</b><em>최대 800KB</em><small>보고·확대 확인</small></span>
+            </label>
+            <label class="preset-card selected">
+              <input type="radio" name="imagePreset" value="balanced" checked />
+              <span><b>균형</b><em>최대 400KB</em><small>웹앱·일반 공유</small></span>
+            </label>
+            <label class="preset-card">
+              <input type="radio" name="imagePreset" value="low" />
+              <span><b>저용량</b><em>최대 200KB</em><small>모바일 확인</small></span>
+            </label>
+            <label class="preset-card custom-card">
+              <input type="radio" name="imagePreset" value="custom" />
+              <span><b>직접 설정</b><em><input id="customImageKb" type="number" min="50" max="2000" step="10" value="300" aria-label="사진 목표 용량 KB" /> KB</em><small>50~2,000KB</small></span>
+            </label>
+          </div>
+          <div class="setting-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6m0-9h.01"/></svg>
+            PNG는 투명 배경과 확장자를 유지하므로 사진 내용에 따라 목표 KB보다 커질 수 있습니다.
+          </div>
+        </div>
+
+        <div class="setting-block">
+          <div class="setting-title-row">
+            <div>
+              <span class="media-label video">VIDEO</span>
+              <h3>동영상 화질</h3>
+            </div>
+            <span class="setting-help">1개씩 순차 처리</span>
+          </div>
+          <div class="preset-grid three" id="videoPresetGroup">
+            <label class="preset-card">
+              <input type="radio" name="videoPreset" value="high" />
+              <span><b>고화질</b><em>1080p</em><small>화질 우선</small></span>
+            </label>
+            <label class="preset-card selected">
+              <input type="radio" name="videoPreset" value="balanced" checked />
+              <span><b>균형</b><em>1080p</em><small>용량·화질 균형</small></span>
+            </label>
+            <label class="preset-card">
+              <input type="radio" name="videoPreset" value="low" />
+              <span><b>저용량</b><em>720p</em><small>공유용</small></span>
+            </label>
+          </div>
+          <div class="setting-note warning">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2L12 3z"/><path d="M12 9v5m0 3h.01"/></svg>
+            모바일에서는 파일당 500MB 이하를 권장합니다. 영상 압축 중에는 화면을 끄지 마세요.
+          </div>
+        </div>
+      </div>
+
+      <div class="output-settings">
+        <label for="zipName">ZIP 파일명</label>
+        <div class="zip-name-control">
+          <input id="zipName" type="text" maxlength="80" />
+          <span>.zip</span>
+        </div>
+        <p>사진 100장 또는 압축 결과 약 700MB를 넘으면 자동으로 1부, 2부로 나눕니다.</p>
+      </div>
+    </section>
+
+    <section class="queue-card card">
+      <div class="section-heading queue-heading">
+        <div>
+          <span class="step-badge">3</span>
+          <h2>압축 진행</h2>
+        </div>
+        <div class="queue-actions">
+          <button id="cancelButton" class="danger-button hidden" type="button">중지</button>
+          <button id="startButton" class="primary-button" type="button" disabled>전체 압축 시작</button>
+        </div>
+      </div>
+
+      <div id="engineStatus" class="engine-status hidden" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <div>
+          <strong id="engineStatusTitle">동영상 압축 엔진 준비 중</strong>
+          <span id="engineStatusText">최초 1회 약 30MB 모듈을 불러옵니다.</span>
+        </div>
+      </div>
+
+      <div id="emptyQueue" class="empty-state">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="9" width="40" height="46" rx="8"/><path d="M20 23h24M20 33h24M20 43h14"/></svg>
+        <strong>선택한 파일이 없습니다</strong>
+        <span>위의 파일 선택 영역에서 사진이나 동영상을 추가하세요.</span>
+      </div>
+      <div id="fileList" class="file-list hidden" aria-live="polite"></div>
+
+      <div id="overallProgressWrap" class="overall-progress hidden">
+        <div class="progress-label"><span id="overallProgressText">준비 중</span><strong id="overallProgressPercent">0%</strong></div>
+        <div class="progress-track"><div id="overallProgressBar" class="progress-bar"></div></div>
+      </div>
+    </section>
+
+    <section id="resultCard" class="result-card card hidden">
+      <div class="result-hero">
+        <div class="result-check" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <div>
+          <span>압축 완료</span>
+          <h2 id="resultTitle">파일을 내려받을 수 있습니다</h2>
+          <p id="resultSummary"></p>
+        </div>
+      </div>
+      <div class="result-metrics">
+        <div><span>원본</span><strong id="resultOriginal">0 B</strong></div>
+        <div><span>압축 후</span><strong id="resultCompressed">0 B</strong></div>
+        <div><span>감소율</span><strong id="resultReduction">0%</strong></div>
+      </div>
+      <div id="downloadList" class="download-list"></div>
+      <button id="downloadAllButton" class="primary-button full" type="button">전체 ZIP 다운로드</button>
+    </section>
+
+    <section class="guide-card card">
+      <h2>사용 시 참고</h2>
+      <div class="guide-grid">
+        <div><span>01</span><p><strong>원본은 변경되지 않습니다.</strong> 압축 결과는 새 파일로 생성됩니다.</p></div>
+        <div><span>02</span><p><strong>파일명과 확장자를 유지합니다.</strong> 같은 이름이 중복되면 ZIP 안의 별도 폴더에 담습니다.</p></div>
+        <div><span>03</span><p><strong>사진은 한 장씩 처리합니다.</strong> 메모리 사용량을 줄여 모바일에서도 안정적으로 동작합니다.</p></div>
+        <div><span>04</span><p><strong>영상은 브라우저 성능에 영향을 받습니다.</strong> 긴 영상은 PC 크롬 사용을 권장합니다.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/jszip/jszip.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

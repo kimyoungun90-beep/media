@@ -1,0 +1,12 @@
+This project includes or loads the following open-source software:
+
+1. JSZip 3.10.1
+   Copyright (c) Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+   License: MIT or GPL-3.0-or-later
+   Project: https://stuk.github.io/jszip/
+
+2. ffmpeg.wasm (@ffmpeg/ffmpeg 0.12.15, @ffmpeg/util 0.12.2, @ffmpeg/core 0.12.10)
+   License: MIT for JavaScript wrapper packages. FFmpeg core contains components under their respective licenses.
+   Project: https://ffmpegwasm.netlify.app/
+
+The application processes user-selected files locally in the browser. The ffmpeg core is fetched lazily from jsDelivr when video compression is requested.
